@@ -88,7 +88,7 @@ footer{text-align:center;color:#8492a6;font-size:11px;padding:18px}
 <body>
 
 <div id="raysisSplash" aria-label="Raysis Printing House introduction">
-  <img class="intro-logo" src="raysis-logo.jpeg" alt="Raysis General Dealers logo">
+  <img class="intro-logo" src="https://raw.githubusercontent.com/markdivinemapalo1-rgb/raysis-management-system-/raysis-v2-combined-upgrade/raysis-logo.jpeg" alt="Raysis General Dealers logo">
   <div class="intro-title">RAYSIS <span>PRINTING HOUSE</span></div>
   <p class="intro-tagline">QUALITY PRINTING • QUALITY BRANDS</p>
 </div>
@@ -574,7 +574,7 @@ async function acceptQuotation(quoteId){
   if(confirm('Download the delivery note now?'))downloadSaleDocument(sale.id,'delivery');
  }catch(e){alert('Quotation conversion failed: '+(e.message||e));}
 }
-function logoDataURL(){return new Promise(resolve=>{const img=new Image();img.onload=()=>{try{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);resolve(c.toDataURL('image/jpeg',0.88));}catch(e){resolve(null);}};img.onerror=()=>resolve(null);img.src='raysis-logo.jpeg';})}
+function logoDataURL(){return new Promise(resolve=>{const img=new Image();img.onload=()=>{try{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);resolve(c.toDataURL('image/jpeg',0.88));}catch(e){resolve(null);}};img.onerror=()=>resolve(null);img.src='https://raw.githubusercontent.com/markdivinemapalo1-rgb/raysis-management-system-/raysis-v2-combined-upgrade/raysis-logo.jpeg';})}
 async function downloadSaleDocument(saleId,kind){
   const sale=db.sales.find(x=>String(x.id)===String(saleId));if(!sale)return alert('Transaction not found.');
   if(!window.jspdf||!window.jspdf.jsPDF){alert('PDF generator could not load. Connect to the internet, refresh the system, and try again.');return;}
