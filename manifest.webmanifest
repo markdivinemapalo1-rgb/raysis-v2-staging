@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Raysis Management System",
+  "name": "Raysis Management System V2",
   "short_name": "Raysis",
-  "description": "Raysis Printing House sales, quotations and branch records",
+  "description": "Raysis Printing House staging application",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -11,15 +11,15 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon-192.svg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-512.svg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any"
     }
   ]
