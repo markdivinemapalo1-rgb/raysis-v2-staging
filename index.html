@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0756a6">
+<title>Raysis Management System V2</title>
+<style>
+:root{--blue:#0756a6;--sky:#28a9e0;--yellow:#f5c400;--ink:#172334;--muted:#64748b;--line:#dce4ed;--bg:#f3f6fa;--white:#fff;--red:#b42318;--green:#16834a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Arial,Helvetica,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:8px;padding:10px 14px;background:var(--blue);color:white;font-weight:700}button.secondary{background:#e8eef6;color:var(--ink)}button.warn{background:#fff0d5;color:#805400}button.danger{background:#fde8e7;color:var(--red)}button.small{padding:6px 9px;font-size:12px}
+header{background:linear-gradient(110deg,#06478c,#0877bb);color:#fff;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:5px solid var(--yellow)}
+.brand{font-size:22px;font-weight:800;letter-spacing:.3px}.brand small{display:block;font-size:11px;font-weight:500;letter-spacing:1.5px;color:#d9efff}
+header .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}header button{background:#fff;color:var(--blue)}
+.shell{display:flex;min-height:calc(100vh - 86px)}nav{width:225px;background:#fff;border-right:1px solid var(--line);padding:16px 12px;flex-shrink:0}
+nav button{display:block;width:100%;text-align:left;margin:4px 0;background:transparent;color:#334155;font-weight:600}nav button.active,nav button:hover{background:#eaf3fc;color:var(--blue)}
+main{padding:22px;max-width:1500px;width:100%;margin:auto}.page{display:none}.page.active{display:block}
+h1{font-size:25px;margin:0 0 5px}h2{font-size:18px;margin:0 0 14px}.sub{color:var(--muted);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0}.stat,.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 2px 8px #1b355008}.stat .num{font-size:26px;font-weight:800;color:var(--blue);margin-top:5px}.stat .label{color:var(--muted);font-size:13px}
+.panel{margin:14px 0}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.formgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;font-weight:700;color:#475569}.field input,.field select,.field textarea{width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:10px;background:#fff;color:var(--ink);min-width:0}.field textarea{min-height:75px;resize:vertical}.span2{grid-column:span 2}.span3{grid-column:span 3}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:700px}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}th{background:#f5f8fc;color:#475569;position:sticky;top:0}td .muted{color:var(--muted);font-size:11px}.tag{display:inline-block;padding:3px 8px;border-radius:99px;background:#e8f1fb;color:var(--blue);font-size:11px;font-weight:700}.tag.paid{background:#e5f6ed;color:var(--green)}.tag.unpaid{background:#fdebea;color:var(--red)}.tag.partial{background:#fff4d6;color:#805400}
+.filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:12px 0}.filters input,.filters select{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:8px;background:#fff}
+.note{padding:12px 14px;background:#fff8df;border-left:4px solid var(--yellow);border-radius:7px;color:#684d00;font-size:13px;margin:12px 0}.success{background:#eaf7ef;border-left-color:var(--green);color:#14532d}
+.login{max-width:440px;margin:7vh auto;background:#fff;padding:26px;border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 40px #17324d12}.login h1{color:var(--blue)}.login .field{margin:12px 0}
+.hidden{display:none!important}.righttext{text-align:right}.muted{color:var(--muted)}.empty{text-align:center;color:var(--muted);padding:25px}
+#printArea{display:none}
+footer{text-align:center;color:#8492a6;font-size:11px;padding:18px}
+@media(max-width:900px){.shell{display:block}nav{width:auto;display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px}nav button{white-space:nowrap;width:auto;margin:0 3px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.span3{grid-column:span 2}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:540px){main{padding:14px}.grid{grid-template-columns:1fr 1fr;gap:8px}.stat{padding:12px}.stat .num{font-size:21px}.formgrid,.filters{grid-template-columns:1fr}.span2,.span3{grid-column:span 1}.brand{font-size:18px}}
+@media print{body{background:#fff}.no-print,header,nav,footer{display:none!important}#app{display:none!important}#printArea{display:block!important;padding:25px;color:#111}#printArea table{min-width:0}#printArea th{position:static}}
+
+/* RAYSIS PRINTING HOUSE INTRO */
+#raysisSplash{
+  position:fixed;inset:0;z-index:99999;background:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:24px;
+  opacity:1;visibility:visible;
+  transition:opacity .7s ease,visibility .7s ease;
+}
+#raysisSplash.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+#raysisSplash .intro-logo{
+  display:block;width:min(72vw,340px);max-height:48vh;object-fit:contain;
+  opacity:0;transform:rotate(-180deg) scale(.55);
+  animation:raysisLogoTurn 2.2s cubic-bezier(.2,.75,.25,1) forwards;
+}
+#raysisSplash .intro-title{
+  margin:20px 0 5px;color:#0756a6;font-size:clamp(22px,4vw,32px);
+  font-weight:800;letter-spacing:1.2px;opacity:0;
+  animation:raysisBrandIn .65s 1.75s ease forwards;
+}
+#raysisSplash .intro-title span{color:#d6a900}
+#raysisSplash .intro-tagline{
+  margin:4px 0 0;color:#64748b;font-size:11px;letter-spacing:2px;
+  opacity:0;animation:raysisBrandIn .65s 2s ease forwards;
+}
+@keyframes raysisLogoTurn{
+  0%{opacity:0;transform:rotate(-180deg) scale(.55)}
+  65%{opacity:1;transform:rotate(390deg) scale(1.05)}
+  100%{opacity:1;transform:rotate(360deg) scale(1)}
+}
+@keyframes raysisBrandIn{to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){
+  #raysisSplash .intro-logo,#raysisSplash .intro-title,#raysisSplash .intro-tagline{
+    animation:none;opacity:1;transform:none
+  }
+}
+
+
+.report-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.report-controls .field{min-width:170px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:#f7faff;border:1px solid var(--line);border-radius:10px;padding:13px}
+.kpi .label{font-size:12px;color:var(--muted)}
+.kpi .value{font-size:21px;font-weight:800;color:var(--blue);margin-top:4px}
+.stock-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stock-summary .stat{margin:0}
+@media(max-width:700px){.kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.stock-summary{grid-template-columns:1fr}}
+
+</style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0756a6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+
+<div id="raysisSplash" aria-label="Raysis Printing House introduction">
+  <img class="intro-logo" src="raysis-logo.jpeg" alt="Raysis General Dealers logo">
+  <div class="intro-title">RAYSIS <span>PRINTING HOUSE</span></div>
+  <p class="intro-tagline">QUALITY PRINTING • QUALITY BRANDS</p>
+</div>
+
+<div id="loginScreen" class="login">
+  <div class="brand" style="color:#0756a6">RAYSIS <span style="color:#f0bd00">MANAGEMENT</span><small style="color:#64748b">VERSION 2 • CLOUD CONNECTED</small></div>
+  <h1 style="margin-top:24px">Secure sign in</h1><p class="sub">Sign in with your assigned Raysis account.</p>
+  <div class="field"><label>Email address</label><input id="loginEmail" type="email" autocomplete="username" placeholder="name@example.com"></div>
+  <div class="field"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Your account password"></div>
+  <div class="field"><label>Supabase publishable key</label><input id="publishableKey" type="password" autocomplete="off" placeholder="sb_publishable_..."></div>
+  <button id="signInButton" style="width:100%;margin-top:8px" onclick="login()">Sign in securely</button>
+  <p id="loginMessage" class="muted" style="font-size:12px;margin-top:15px">Cloud connection: awaiting configuration. Enter the publishable key from Supabase API Keys. It is safe for browser use with RLS enabled. Never enter a secret or service_role key.</p>
+</div>
+<div id="app" class="hidden">
+<header><div class="brand">RAYSIS MANAGEMENT SYSTEM <small>VERSION 2 • QUALITY PRINTING, QUALITY BRANDS</small></div><div class="right"><span id="userLabel"></span><span id="cloudStatus" class="tag">Cloud: connecting</span><button onclick="logout()">Log out</button></div></header>
+<div class="shell">
+<nav id="nav">
+<button class="active" data-page="dashboard" onclick="showPage('dashboard',this)">Dashboard</button>
+<button data-page="sales" onclick="showPage('sales',this)">Record sale / job</button>
+<button data-page="quotations" onclick="showPage('quotations',this)">Quotations</button>
+<button data-page="performance" onclick="showPage('performance',this)">Branch performance</button>
+<button data-page="inventory" onclick="showPage('inventory',this)">Stock inventory</button>
+
+<button data-page="search" onclick="showPage('search',this)">Search & tracking</button>
+<button data-page="audit" onclick="showPage('audit',this)">Audit trail</button>
+<button data-page="corrections" onclick="showPage(&quot;corrections&quot;,this)">Correction requests</button>
+<button id="usersNav" data-page="users" onclick="showPage(&quot;users&quot;,this)">User administration</button>
+<button data-page="backup" onclick="showPage('backup',this)">Data & backup</button>
+</nav>
+<main>
+<section id="dashboard" class="page active">
+<h1>Dashboard</h1><p class="sub">Business overview across your permitted branch records.</p>
+<div class="grid">
+<div class="stat"><div class="label">Total recorded sales</div><div class="num" id="statSales">K0.00</div></div>
+<div class="stat"><div class="label">Outstanding balance</div><div class="num" id="statBalance">K0.00</div></div>
+<div class="stat"><div class="label">Jobs / transactions</div><div class="num" id="statCount">0</div></div>
+<div class="stat"><div class="label">Quotations issued</div><div class="num" id="statQuotes">0</div></div>
+</div>
+<div class="actions no-print"><button class="small" onclick="showPage('performance')">Branch Performance & Revenue</button><button class="small secondary" onclick="showPage('inventory')">Open Stock Inventory</button></div>
+<div class="panel"><div class="panel-head"><h2>Recent transactions</h2><button class="small secondary" onclick="showPage('search')">Open tracking centre</button></div><div id="recentTable" class="tablewrap"></div></div>
+<div class="note">Cloud records and the audit trail are stored in Supabase. Pending writes are queued locally until cloud sync succeeds; keep independent backups.</div>
+</section>
+<section id="sales" class="page">
+<h1>Record sale / job</h1><p class="sub">Create a receipt record for printing jobs, products and services.</p>
+<div class="panel">
+<div class="formgrid">
+<div class="field"><label>Branch</label><select id="saleBranch"><option>Mansa</option><option>Chinsali</option></select></div>
+<div class="field"><label>Transaction / receipt number</label><input id="saleReceipt" placeholder="Auto-generated if blank"></div>
+<div class="field"><label>Date</label><input id="saleDate" type="date"></div>
+<div class="field"><label>Customer name</label><input id="saleCustomer" placeholder="Customer name"></div>
+<div class="field"><label>Customer phone</label><input id="salePhone" placeholder="Phone number"></div>
+<div class="field"><label>Product / service</label><input id="saleProduct" placeholder="e.g. 2m banner printing"></div>
+<div class="field"><label>Total amount (K)</label><input id="saleTotal" type="number" min="0" step="0.01" placeholder="0.00"></div>
+<div class="field"><label>Amount paid (K)</label><input id="salePaid" type="number" min="0" step="0.01" placeholder="0.00" value="0"></div>
+<div class="field"><label>Payment method</label><select id="saleMethod"><option>Cash</option><option>Mobile Money</option><option>Bank transfer</option><option>Other</option></select></div>
+<div class="field"><label>Material used (optional)</label><input id="saleMaterial" list="saleMaterialOptions" placeholder="e.g. Banner material"><datalist id="saleMaterialOptions"><option>Banner material</option><option>Vinyl sticker</option><option>DTF film</option><option>Canvas</option></datalist></div>
+<div class="field"><label>Metres used</label><input id="saleMetres" type="number" min="0" step="0.01" placeholder="0.00"></div>
+<div class="field span3"><label>Job details / notes</label><textarea id="saleNotes" placeholder="Sizes, materials, finishing, collection date, etc."></textarea></div>
+</div><div class="actions"><button onclick="saveSale()">Save transaction</button><button class="secondary" onclick="clearSale()">Clear form</button></div>
+</div>
+<div class="panel"><h2>Latest transactions</h2><div id="salesTable" class="tablewrap"></div></div>
+</section>
+<section id="quotations" class="page">
+<h1>Quotation centre</h1><p class="sub">Prepare and save customer quotations. Convert an accepted quotation into a sale, then download its linked invoice and delivery note as PDFs.</p>
+<div class="panel">
+<div class="formgrid">
+<div class="field"><label>Branch</label><select id="qBranch"><option>Mansa</option><option>Chinsali</option></select></div>
+<div class="field"><label>Quotation number</label><input id="qNumber" placeholder="Auto-generated if blank"></div>
+<div class="field"><label>Date</label><input id="qDate" type="date"></div>
+<div class="field"><label>Customer / company</label><input id="qCustomer" placeholder="Customer name"></div>
+<div class="field"><label>Phone / email</label><input id="qContact" placeholder="Contact details"></div>
+<div class="field"><label>Validity (days)</label><input id="qValidity" type="number" value="14" min="1"></div>
+<div class="field span3"><label>Items (one item per line: Description | Qty | Unit price)</label><textarea id="qItems" rows="5" placeholder="2m banner printing | 2 | 180&#10;Design and layout | 1 | 250"></textarea></div>
+<div class="field span3"><label>Terms / notes</label><textarea id="qTerms" placeholder="e.g. 70% deposit required before production."></textarea></div>
+</div><div class="actions"><button onclick="previewQuote()">Preview quotation</button><button class="secondary" onclick="saveQuote()">Save quotation record</button><button class="secondary" onclick="clearQuote()">Clear</button></div>
+<div id="quotePreview" class="note hidden"></div>
+</div>
+<div class="panel"><h2>Saved quotations</h2><div id="quotesTable" class="tablewrap"></div></div>
+</section>
+
+<section id="performance" class="page">
+<h1>Branch Performance & Revenue Report</h1>
+<p class="sub">Compare recorded sales, money collected and customer balances by branch and reporting period.</p>
+<div class="panel">
+  <div class="report-controls">
+    <div class="field"><label>Reporting period</label>
+      <select id="reportPeriod" onchange="renderPerformance()">
+        <option value="daily">Daily</option><option value="weekly">Weekly</option>
+        <option value="monthly" selected>Monthly</option><option value="yearly">Yearly</option>
+      </select>
+    </div>
+    <div class="field"><label>Reference date</label><input id="reportDate" type="date" onchange="renderPerformance()"></div>
+    <button onclick="renderPerformance()">Update report</button>
+  </div>
+  <p id="reportRange" class="muted" style="margin:12px 0 0"></p>
+</div>
+<div class="kpi-grid">
+  <div class="kpi"><div class="label">Recorded sales</div><div class="value" id="reportSales">K0.00</div></div>
+  <div class="kpi"><div class="label">Money collected</div><div class="value" id="reportCollected">K0.00</div></div>
+  <div class="kpi"><div class="label">Outstanding balance</div><div class="value" id="reportOutstanding">K0.00</div></div>
+  <div class="kpi"><div class="label">Jobs / transactions</div><div class="value" id="reportJobs">0</div></div>
+</div>
+<div class="panel">
+  <div class="panel-head"><h2>Branch comparison</h2><span class="muted">CEO sees both branches; branch users see their branch only</span></div>
+  <div id="branchPerformanceTable" class="tablewrap"></div>
+</div>
+<div class="panel">
+  <h2>Material consumption for this period</h2>
+  <div id="periodMaterialUsage" class="tablewrap"></div>
+</div>
+<div class="note">Sales are based on the transaction date. Collections use the amount currently recorded as paid. Profit is not shown because expenses and material purchase costs are not being tracked in this version.</div>
+</section>
+
+<section id="inventory" class="page">
+<h1>Stock Inventory</h1>
+<p class="sub">Separate Mansa and Chinsali stock records. Quantities are tracked in metres; purchase costs are not recorded.</p>
+<div class="panel">
+  <h2>Receive stock</h2>
+  <div class="formgrid">
+    <div class="field"><label>Branch</label><select id="stockBranch"><option>Mansa</option><option>Chinsali</option></select></div>
+    <div class="field"><label>Material</label><input id="stockMaterial" list="materialOptions" placeholder="e.g. Banner material"><datalist id="materialOptions"><option>Banner material</option><option>Vinyl sticker</option><option>DTF film</option><option>Canvas</option><option>Other</option></datalist></div>
+    <div class="field"><label>Metres received</label><input id="stockReceived" type="number" min="0.01" step="0.01" placeholder="0.00"></div>
+  </div>
+  <div class="actions"><button onclick="receiveStock()">Record stock received</button></div>
+</div>
+<div class="panel">
+  <h2>Record material usage</h2>
+  <p class="muted">Use this when material is consumed outside a sale record. Material usage entered on a sale is deducted automatically.</p>
+  <div class="formgrid">
+    <div class="field"><label>Branch</label><select id="usageBranch"><option>Mansa</option><option>Chinsali</option></select></div>
+    <div class="field"><label>Material</label><input id="usageMaterial" list="materialOptionsUsage" placeholder="Material name"><datalist id="materialOptionsUsage"><option>Banner material</option><option>Vinyl sticker</option><option>DTF film</option><option>Canvas</option></datalist></div>
+    <div class="field"><label>Metres used</label><input id="usageMetres" type="number" min="0.01" step="0.01" placeholder="0.00"></div>
+    <div class="field span3"><label>Reason / job reference</label><input id="usageReason" placeholder="Job number, wastage, test print, etc."></div>
+  </div>
+  <div class="actions"><button onclick="recordStockUsage()">Record material usage</button></div>
+</div>
+<div class="panel">
+  <div class="panel-head"><h2>Current stock by branch</h2><button class="small secondary" onclick="renderInventory()">Refresh stock</button></div>
+  <div id="inventoryTable" class="tablewrap"></div>
+</div>
+<div class="panel">
+  <div class="panel-head"><h2>Stock movement history</h2><button class="small secondary" onclick="downloadStockCSV()">Export stock CSV</button></div>
+  <div id="stockMovementTable" class="tablewrap"></div>
+</div>
+<div class="note">Inventory movements are stored in Supabase and branch access is enforced by database policies. Cross-device stock sharing still requires the cloud database integration.</div>
+</section>
+
+<section id="search" class="page">
+<h1>Search & tracking centre</h1><p class="sub">Filter transactions by date, branch, receipt, customer, product, payment status, amount and recorder.</p>
+<div class="panel">
+<div class="filters">
+<input id="fFrom" type="date" aria-label="From date"><input id="fTo" type="date" aria-label="To date">
+<select id="fBranch"><option value="">All permitted branches</option><option>Mansa</option><option>Chinsali</option></select>
+<input id="fReceipt" placeholder="Receipt / transaction no.">
+<input id="fCustomer" placeholder="Customer name or phone">
+<input id="fProduct" placeholder="Product / service">
+<select id="fStatus"><option value="">All payment statuses</option><option>Paid</option><option>Partially paid</option><option>Unpaid</option></select>
+<input id="fMin" type="number" placeholder="Minimum amount"><input id="fMax" type="number" placeholder="Maximum amount">
+<input id="fUser" placeholder="Recorded by">
+</div><div class="actions"><button onclick="renderSearch()">Search records</button><button class="secondary" onclick="clearFilters()">Clear filters</button><button class="secondary" onclick="exportSearch()">Export results CSV</button></div>
+</div><div class="panel"><div class="panel-head"><h2>Search results</h2><span id="resultCount" class="muted"></span></div><div id="searchTable" class="tablewrap"></div></div>
+</section>
+<section id="audit" class="page">
+<h1>Audit trail</h1><p class="sub">A record of transactions, quotations and backup actions captured in this browser.</p>
+<div class="panel"><div id="auditTable" class="tablewrap"></div></div>
+</section>
+<section id="corrections" class="page">
+<h1>Correction requests</h1><p class="sub">Staff submit correction requests; the CEO reviews them.</p>
+<div class="panel" id="correctionSubmitPanel"><div class="formgrid">
+<div class="field"><label>Record type</label><select id="correctionType"><option value="sale">Sale / job</option><option value="quotation">Quotation</option><option value="stock_movement">Stock movement</option><option value="payment">Payment</option></select></div>
+<div class="field"><label>Record reference</label><input id="correctionRecord" placeholder="Receipt / quotation / record ID"></div>
+<div class="field span3"><label>Reason and requested change</label><textarea id="correctionReason" rows="3"></textarea></div>
+</div><div class="actions"><button onclick="submitCorrection()">Submit request</button></div></div>
+<div class="panel"><h2>Requests</h2><div id="correctionTable" class="tablewrap"></div></div></section>
+<section id="users" class="page">
+<h1>CEO user administration</h1><p class="sub">CEO-only account management.</p>
+<div class="panel"><h2>Create account</h2><div class="formgrid">
+<div class="field"><label>Full name</label><input id="newUserName"></div>
+<div class="field"><label>Email</label><input id="newUserEmail" type="email"></div>
+<div class="field"><label>Temporary password (10+ characters)</label><input id="newUserPassword" type="password"></div>
+<div class="field"><label>Role</label><select id="newUserRole"><option value="branch_user">Branch user</option><option value="ceo">CEO</option></select></div>
+<div class="field"><label>Branch</label><select id="newUserBranch"><option>Mansa</option><option>Chinsali</option></select></div>
+</div><div class="actions"><button onclick="createStaffUser()">Create account</button><button class="secondary" onclick="loadStaffUsers()">Refresh users</button></div></div>
+<div class="panel"><h2>Users</h2><div id="usersTable" class="tablewrap"></div></div></section>
+<section id="backup" class="page">
+<h1>Data & backup</h1><p class="sub">Export a backup file regularly. Import a backup to restore or transfer records to another device.</p>
+<div class="panel"><h2>Backup and restore</h2><div class="actions"><button onclick="downloadBackup()">Download full backup (JSON)</button><label class="secondary" style="padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:700">Import backup <input id="backupFile" type="file" accept=".json,application/json" style="display:none" onchange="importBackup(event)"></label><button class="secondary" onclick="downloadSalesCSV()">Export transactions CSV</button></div><p class="muted">Keep backup files in a safe place. Importing a backup replaces the records currently stored in this browser.</p></div>
+<div class="panel"><h2>Branch access</h2><p id="accessInfo"></p><div class="note">Accounts use Supabase email/password authentication. Branch access is enforced by Supabase Row Level Security. CEO account administration is available only through the protected CEO Edge Function.</div></div>
+<div class="panel"><h2>System readiness</h2><ul><li>Offline browser storage: available on this device after the page has loaded.</li><li>Branch performance reports: daily, weekly, monthly and yearly sales, collections and balances.</li><li>Stock inventory: separate branch quantities, receipts, material usage and movement history; metres tracked without purchase costs.</li><li>Invoices and delivery notes: accepted quotations can be converted to linked sales, with downloadable PDF documents carrying Raysis business details.</li><li>Cross-device cloud synchronization: connected through Supabase when signed in online.</li><li>Secure email/password authentication and branch permissions: enforced by Supabase Auth and Row Level Security.</li><li>Keep regular JSON backups; cloud database backups depend on your Supabase plan.</li></ul></div>
+</section>
+</main></div><footer>Raysis Management System V2 • Prototype build • Keep independent backups of important business records.</footer>
+</div>
+<div id="printArea"></div>
+
+<script>
+/* Hold on the fully visible Raysis brand, then reveal the existing login panel. */
+(function(){
+  var splash = document.getElementById('raysisSplash');
+  if (!splash) return;
+  window.setTimeout(function(){
+    splash.classList.add('is-leaving');
+    window.setTimeout(function(){
+      if (splash.parentNode) splash.parentNode.removeChild(splash);
+    }, 750);
+  }, 4400);
+})();
+</script>
+
+<script>
+(function(){
+  var logo = document.querySelector('#raysisSplash .intro-logo');
+  if (logo) logo.addEventListener('error', function(){
+    this.style.display = 'none';
+  });
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const KEY='raysis_v2_staging_data_1', CFG='raysis_v2_staging_supabase_config_v1';
+const PROJECT_URL='https://vrstuxentgssrmndcslh.supabase.co';
+let db={sales:[],quotes:[],audit:[],stockMovements:[]},session=null,lastQuote=null,supabaseClient=null,syncQueue=Promise.resolve(),cloudReady=false,cloudReachable=null,connectivityTimer=null,offlineMode=false,reconnecting=false;
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+const money=n=>'K'+(Number(n)||0).toLocaleString('en-ZM',{minimumFractionDigits:2,maximumFractionDigits:2});
+function loadLocal(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.sales))db={sales:x.sales,quotes:x.quotes||[],audit:x.audit||[],stockMovements:x.stockMovements||[]}}catch(e){}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));if(cloudReady)queueCloudSync()}
+function setCloudStatus(msg,ok=false){const el=$('cloudStatus');if(el){el.textContent=msg;el.className='tag '+(ok?'paid':'')}}
+function getConfig(){let c={};try{c=JSON.parse(localStorage.getItem(CFG)||'{}')}catch(e){};return c}
+function saveConfig(key){localStorage.setItem(CFG,JSON.stringify({url:PROJECT_URL,key}));}
+async function activateSession(user,allowOffline=false){
+ const email=user.email||'';
+ let profile=null;
+ const {data:remoteProfile,error:pe}=await supabaseClient.from('profiles').select('full_name,role,branch_name').eq('id',user.id).single();
+ if(pe){
+  let cached=null;try{cached=JSON.parse(localStorage.getItem('raysis_v2_staging_profile_'+user.id)||'null')}catch(e){}
+  if(!allowOffline||!cached)throw pe;
+  profile=cached;offlineMode=true;cloudReady=false;
+ }else{
+  profile=remoteProfile;offlineMode=false;
+  if(profile)localStorage.setItem('raysis_v2_staging_profile_'+user.id,JSON.stringify(profile));
+ }
+ if(!profile||!['ceo','branch_user'].includes(profile.role))throw new Error('Your Raysis profile is not configured. Contact the CEO.');
+ session={userId:user.id,email,role:profile.role,branch:profile.role==='ceo'?'All':profile.branch_name,label:profile.full_name||email};
+ $('usersNav').style.display=session.role==='ceo'?'':'none';$('correctionSubmitPanel').style.display=session.role==='ceo'?'none':'';
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$('dashboard').classList.add('active');
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page==='dashboard'));
+ $('usersTable').innerHTML='';
+ $('loginScreen').classList.add('hidden');$('app').classList.remove('hidden');$('userLabel').textContent=session.label+' • '+(session.branch==='All'?'All branches':session.branch);
+ ['saleBranch','qBranch','stockBranch','usageBranch'].forEach(id=>{if(session.branch!=='All')$(id).value=session.branch;$(id).disabled=session.branch!=='All'});
+ $('accessInfo').textContent=session.branch==='All'?'CEO access: Mansa and Chinsali records.':'Branch access: '+session.branch+' records only.';
+ if(offlineMode){setCloudStatus('Cloud: offline');init();startConnectivityMonitor();return;}
+ await loadCloudData();cloudReady=true;setCloudStatus('Cloud: connected',true);queueCloudSync();startConnectivityMonitor();init();
+}
+async function login(){
+ const email=$('loginEmail').value.trim(),password=$('loginPassword').value,key=$('publishableKey').value.trim()||getConfig().key;
+ if(!email||!password){$('loginMessage').textContent='Enter your email and password.';return}
+ if(!key||!key.startsWith('sb_publishable_')){$('loginMessage').textContent='Enter the Supabase publishable key (starts with sb_publishable_). Do not use a secret key.';return}
+ $('signInButton').disabled=true;$('loginMessage').textContent='Connecting securely to Raysis cloud…';
+ try{
+  saveConfig(key);supabaseClient=window.supabase.createClient(PROJECT_URL,key,{auth:{storageKey:'raysis-v2-staging-auth-token'}});
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});if(error)throw error;
+  await activateSession(data.user);
+ }catch(e){console.error(e);$('loginMessage').textContent='Sign-in/connection failed: '+(e.message||'Please check your details and try again.');}
+ finally{$('signInButton').disabled=false}
+}
+async function restoreSession(){
+ const key=getConfig().key;
+ if(!key||!key.startsWith('sb_publishable_'))return;
+ try{
+  supabaseClient=window.supabase.createClient(PROJECT_URL,key,{auth:{storageKey:'raysis-v2-staging-auth-token'}});
+  const {data,error}=await supabaseClient.auth.getSession();if(error)throw error;
+  if(data.session&&data.session.user){
+   $('loginMessage').textContent='Restoring your secure Raysis session…';
+   await activateSession(data.session.user,true);
+  }
+ }catch(e){
+  console.error('Raysis session restore failed:',e);
+  session=null;cloudReady=false;
+  $('loginScreen').classList.remove('hidden');$('app').classList.add('hidden');
+  $('loginMessage').textContent='Please sign in again. Session could not be restored: '+(e.message||'connection issue');
+ }
+}
+async function logout(){cloudReady=false;offlineMode=false;if(session?.userId)localStorage.removeItem('raysis_v2_staging_profile_'+session.userId);if(supabaseClient)await supabaseClient.auth.signOut();session=null;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$('dashboard').classList.add('active');document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page==='dashboard'));$('usersNav').style.display='none';$('usersTable').innerHTML='';$('app').classList.add('hidden');$('loginScreen').classList.remove('hidden');$('loginPassword').value='';$('loginMessage').textContent='Signed out. Your records remain safely stored in Supabase.'}
+async function loadCloudData(){
+ setCloudStatus('Cloud: loading…');
+ const [sr,qr,mr]=await Promise.all([
+  supabaseClient.from('sales').select('*').order('transaction_date',{ascending:false}),
+  supabaseClient.from('quotations').select('*').order('quotation_date',{ascending:false}),
+  supabaseClient.from('stock_movements').select('*').order('movement_date',{ascending:false})
+ ]);
+ for(const r of [sr,qr,mr])if(r.error)throw r.error;
+ db.sales=(sr.data||[]).map(r=>({id:Number(r.id),clientOperationId:r.client_operation_id||null,branch:r.branch_name,receipt:r.receipt_number,date:r.transaction_date,customer:r.customer_name,phone:r.customer_phone||'',product:r.product_service,total:Number(r.total_amount),paid:Number(r.amount_paid),method:r.payment_method||'Cash',notes:r.notes||'',user:r.recorded_by||'',items:r.items||[],material:r.material_name||'',metres:Number(r.metres_used||0),invoiceNo:r.invoice_number||'INV-'+String(r.id).slice(-7),deliveryNo:r.delivery_note_number||'DN-'+String(r.id).slice(-7),quoteId:r.quotation_id,quoteNumber:r.quotation_number,cloudSaved:true}));
+ db.quotes=(qr.data||[]).map(r=>({id:Number(r.id),clientOperationId:r.client_operation_id||null,branch:r.branch_name,number:r.quotation_number,date:r.quotation_date,customer:r.customer_name,contact:r.customer_contact||'',validity:Number(r.validity_days||14),items:r.items||[],terms:r.terms||'',total:Number(r.total_amount),user:r.recorded_by||'',convertedSaleId:r.accepted_sale_id,acceptedDate:r.accepted_date,cloudSaved:true}));
+ db.stockMovements=(mr.data||[]).map(r=>({id:Number(r.id),clientOperationId:r.client_operation_id||null,branch:r.branch_name,material:r.material_name,metres:Number(r.quantity_metres),type:r.movement_type,date:r.movement_date,reason:r.reason||'',user:r.recorded_by||'',cloudSaved:true}));
+ // Restore pending local writes only when their operation UUID is not already present in cloud data.
+ // This avoids showing the same record twice if cloud insertion succeeded just before the browser closed.
+ try{
+  const local=JSON.parse(localStorage.getItem(KEY)||'{}');
+  const appendUnconfirmed=(cloudRows,localRows)=>{
+   const known=new Set(cloudRows.map(x=>x.clientOperationId).filter(Boolean));
+   return (Array.isArray(localRows)?localRows:[]).filter(x=>
+    x.cloudSaved===false&&(!x.clientOperationId||!known.has(x.clientOperationId))
+   );
+  };
+  db.sales.push(...appendUnconfirmed(db.sales,local.sales));
+  db.quotes.push(...appendUnconfirmed(db.quotes,local.quotes));
+  db.stockMovements.push(...appendUnconfirmed(db.stockMovements,local.stockMovements));
+ }catch(e){console.warn('Pending offline queue could not be restored',e);}
+ // Supabase is authoritative after login. Never replace freshly loaded cloud records with a stale browser snapshot.
+ // Local browser storage is retained only as a legacy backup; it is not merged into the live cloud dataset.
+}
+function queueCloudSync(){syncQueue=syncQueue.then(()=>syncCloudData()).catch(e=>{console.error(e);setCloudStatus('Cloud sync error');});}
+async function checkCloudConnectivity(){
+  if(!supabaseClient)return false;
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),7000);
+  try{
+   // Any HTTP response (including 401) proves the Supabase endpoint is reachable.
+   await fetch(PROJECT_URL+'/auth/v1/health',{method:'GET',headers:{apikey:getConfig().key||''},cache:'no-store',signal:controller.signal});
+   const wasReachable=cloudReachable;cloudReachable=true;
+   const statusText=$('cloudStatus')?.textContent||'';
+   if(offlineMode&&!reconnecting){
+    reconnecting=true;
+    try{
+     const {data:userData,error:userError}=await supabaseClient.auth.getUser();
+     if(userError)throw userError;
+     await activateSession(userData.user,false);
+    }catch(e){console.error('Raysis online revalidation failed:',e);setCloudStatus('Cloud: sign-in required');}
+    finally{reconnecting=false;}
+    return true;
+   }
+   if(cloudReady&&(wasReachable===false||statusText.includes('checking connection')||statusText.includes('offline'))){
+    setCloudStatus('Cloud: connected');
+    queueCloudSync();
+   }
+   return true;
+  }catch(e){
+   cloudReachable=false;
+   if(cloudReady)setCloudStatus('Cloud: offline');
+   return false;
+  }finally{clearTimeout(timeout);}
+ }
+ function startConnectivityMonitor(){
+  if(connectivityTimer)clearInterval(connectivityTimer);
+  checkCloudConnectivity();
+  connectivityTimer=setInterval(checkCloudConnectivity,15000);
+ }
+ window.addEventListener('offline',()=>{cloudReachable=false;if(cloudReady)setCloudStatus('Cloud: offline');});
+ window.addEventListener('online',()=>{if(cloudReady)setCloudStatus('Cloud: checking connection…');checkCloudConnectivity();});
+async function insertOnce(table,row,operationId){
+ const payload={...row,client_operation_id:operationId};
+ let result=await supabaseClient.from(table).insert(payload).select('*').single();
+ if(result.error&&result.error.code==='23505'){
+  result=await supabaseClient.from(table).select('*').eq('client_operation_id',operationId).single();
+ }
+ if(result.error)throw result.error;
+ return result.data;
+}
+async function syncCloudData(){
+ if(!cloudReady||!supabaseClient||!session)return;
+ const checkpoint=()=>localStorage.setItem(KEY,JSON.stringify(db));
+ const pendingSales=db.sales.filter(s=>!s.cloudSaved&&(session.branch==='All'||s.branch===session.branch));
+ const pendingQuotes=db.quotes.filter(q=>!q.cloudSaved&&(session.branch==='All'||q.branch===session.branch));
+ const pendingMoves=db.stockMovements.filter(m=>!m.cloudSaved&&(session.branch==='All'||m.branch===session.branch));
+ // Persist each operation UUID BEFORE sending its insert. A reload or interrupted
+ // request will therefore retry with the same idempotency key.
+ for(const s of pendingSales){
+  if(!s.clientOperationId)s.clientOperationId=crypto.randomUUID();
+  checkpoint();
+  const row=await insertOnce('sales',{branch_name:s.branch,receipt_number:s.receipt,transaction_date:s.date,customer_name:s.customer,customer_phone:s.phone||'',product_service:s.product,total_amount:s.total,amount_paid:s.paid,payment_method:s.method||'Cash',notes:s.notes||'',created_by:session.userId,items:s.items||[],material_name:s.material||'',metres_used:Number(s.metres||0),invoice_number:s.invoiceNo||'',delivery_note_number:s.deliveryNo||'',quotation_id:s.quoteId||null,quotation_number:s.quoteNumber||null,recorded_by:s.user||session.label},s.clientOperationId);
+  s.id=Number(row.id);s.cloudSaved=true;checkpoint();
+ }
+ for(const q of pendingQuotes){
+  if(!q.clientOperationId)q.clientOperationId=crypto.randomUUID();
+  checkpoint();
+  const row=await insertOnce('quotations',{branch_name:q.branch,quotation_number:q.number,quotation_date:q.date,customer_name:q.customer,customer_contact:q.contact||'',validity_days:q.validity||14,items:q.items||[],terms:q.terms||'',total_amount:q.total,status:'saved',created_by:session.userId,recorded_by:q.user||session.label},q.clientOperationId);
+  q.id=Number(row.id);q.cloudSaved=true;checkpoint();
+ }
+ for(const m of pendingMoves){
+  if(!m.clientOperationId)m.clientOperationId=crypto.randomUUID();
+  checkpoint();
+  const row=await insertOnce('stock_movements',{branch_name:m.branch,material_name:m.material,movement_type:m.type,quantity_metres:m.metres,movement_date:m.date,reason:m.reason||'',created_by:session.userId,recorded_by:m.user||session.label},m.clientOperationId);
+  m.id=Number(row.id);m.cloudSaved=true;checkpoint();
+ }
+ setCloudStatus('Cloud: synced',true);
+}
+function log(action,detail){db.audit.unshift({id:Date.now()+Math.random(),date:new Date().toLocaleString(),user:session?.label||'System',branch:session?.branch||'All',action,detail});persist()}
+function visibleSales(){return db.sales.filter(s=>session.branch==='All'||s.branch===session.branch)}
+function visibleQuotes(){return db.quotes.filter(q=>session.branch==='All'||q.branch===session.branch)}
+function showPage(id,btn){if(!session)return;if(id==='users'&&session.role!=='ceo'){alert('User administration is restricted to the CEO account.');id='dashboard'}const page=$(id);if(!page||!page.classList.contains('page'))return;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));page.classList.add('active');document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(id==='dashboard')renderDashboard();if(id==='sales')renderSales();if(id==='quotations')renderQuotes();if(id==='search')renderSearch();if(id==='audit')renderAudit();if(id==='corrections')loadCorrectionRequests();if(id==='users')loadStaffUsers();if(id==='performance')renderPerformance();if(id==='inventory')renderInventory()}
+function init(){$('saleDate').value=today();$('qDate').value=today();renderDashboard();renderSales();renderQuotes();renderSearch();renderAudit();$('reportDate').value=today();renderPerformance();renderInventory()}
+function paymentStatus(s){return s.paid>=s.total?'Paid':s.paid>0?'Partially paid':'Unpaid'}
+function tag(status){return '<span class="tag '+(status==='Paid'?'paid':status==='Unpaid'?'unpaid':'partial')+'">'+status+'</span>'}
+function salesRows(arr){if(!arr.length)return '<div class="empty">No transactions found.</div>';return '<table><thead><tr><th>Date / Receipt</th><th>Branch</th><th>Customer</th><th>Product / service</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Recorded by</th><th>Documents</th></tr></thead><tbody>'+arr.map(s=>`<tr><td>${esc(s.date)}<div class="muted">${esc(s.receipt)}</div></td><td>${esc(s.branch)}</td><td>${esc(s.customer)}<div class="muted">${esc(s.phone)}</div></td><td>${esc(s.product)}<div class="muted">${esc(s.notes||'')}</div></td><td>${money(s.total)}</td><td>${money(s.paid)}</td><td>${money(Math.max(0,s.total-s.paid))}</td><td>${tag(paymentStatus(s))}</td><td>${esc(s.user)}</td><td><button class="small" onclick="downloadSaleDocument(${s.id},'invoice')">Invoice PDF</button> <button class="small secondary" onclick="downloadSaleDocument(${s.id},'delivery')">Delivery PDF</button></td></tr>`).join('')+'</tbody></table>'}
+function renderDashboard(){if(!session)return;const a=visibleSales(),total=a.reduce((n,s)=>n+s.total,0),bal=a.reduce((n,s)=>n+Math.max(0,s.total-s.paid),0);$('statSales').textContent=money(total);$('statBalance').textContent=money(bal);$('statCount').textContent=a.length;$('statQuotes').textContent=visibleQuotes().length;$('recentTable').innerHTML=salesRows(a.slice(0,8))}
+function saveSale(){const total=Number($('saleTotal').value),paid=Number($('salePaid').value||0),branch=$('saleBranch').value;if(!session)return;if(!total||total<0||paid<0||paid>total){alert('Enter a valid total and payment. Amount paid cannot exceed the total.');return}if(!$('saleCustomer').value.trim()||!$('saleProduct').value.trim()){alert('Enter customer name and product/service.');return}const material=$('saleMaterial').value.trim(),metres=Number($('saleMetres').value||0);if(metres<0||(!material&&metres>0)||(material&&metres<=0)){alert('If you enter material, also enter metres used. Metres cannot be negative.');return}if(material&&metres>stockBalance(branch,material)){alert('Insufficient '+material+' stock in '+branch+'. Available: '+stockBalance(branch,material).toFixed(2)+' m. Receive stock first.');return}const saleId=Date.now(),receipt=$('saleReceipt').value.trim()||'RYS-'+branch.slice(0,1).toUpperCase()+'-'+saleId.toString().slice(-7);const s={id:saleId,clientOperationId:crypto.randomUUID(),cloudSaved:false,branch,material,metres,receipt,date:$('saleDate').value||today(),customer:$('saleCustomer').value.trim(),phone:$('salePhone').value.trim(),product:$('saleProduct').value.trim(),items:[{description:$('saleProduct').value.trim(),qty:1,price:total}],total,paid,method:$('saleMethod').value,notes:$('saleNotes').value.trim(),user:session.label,invoiceNo:'INV-'+branch.slice(0,1).toUpperCase()+'-'+saleId.toString().slice(-7),deliveryNo:'DN-'+branch.slice(0,1).toUpperCase()+'-'+saleId.toString().slice(-7)};db.sales.unshift(s);if(material&&metres>0)db.stockMovements.unshift({id:Date.now()+1,clientOperationId:crypto.randomUUID(),cloudSaved:false,date:s.date,branch,material,metres,type:'use',reason:'Sale '+s.receipt,user:session.label});log('Sale recorded',s.receipt+' • '+s.customer+' • '+money(total));persist();clearSale();renderSales();renderDashboard();renderSearch();alert('Transaction saved. You can now download its Invoice PDF and Delivery Note PDF from the transaction record.')}
+function clearSale(){['saleReceipt','saleCustomer','salePhone','saleProduct','saleTotal','saleNotes','saleMaterial','saleMetres'].forEach(id=>$(id).value='');$('salePaid').value='0';$('saleDate').value=today()}
+function renderSales(){$('salesTable').innerHTML=salesRows(visibleSales().slice(0,30))}
+
+function reportBounds(period,refDate){
+  const d=new Date(refDate+'T12:00:00');let start=new Date(d),end=new Date(d);
+  if(period==='daily'){start.setHours(0,0,0,0);end.setHours(23,59,59,999)}
+  else if(period==='weekly'){const day=(d.getDay()+6)%7;start.setDate(d.getDate()-day);start.setHours(0,0,0,0);end=new Date(start);end.setDate(start.getDate()+6);end.setHours(23,59,59,999)}
+  else if(period==='monthly'){start=new Date(d.getFullYear(),d.getMonth(),1);end=new Date(d.getFullYear(),d.getMonth()+1,0,23,59,59,999)}
+  else {start=new Date(d.getFullYear(),0,1);end=new Date(d.getFullYear(),11,31,23,59,59,999)}
+  const fmt=x=>x.toISOString().slice(0,10);return {from:fmt(start),to:fmt(end)};
+}
+function renderPerformance(){
+  if(!session)return;
+  const ref=$('reportDate').value||today(),period=$('reportPeriod').value,b=reportBounds(period,ref);
+  const sales=visibleSales().filter(s=>s.date>=b.from&&s.date<=b.to);
+  const total=sales.reduce((n,s)=>n+(Number(s.total)||0),0),paid=sales.reduce((n,s)=>n+(Number(s.paid)||0),0),balance=sales.reduce((n,s)=>n+Math.max(0,(Number(s.total)||0)-(Number(s.paid)||0)),0);
+  $('reportRange').textContent='Period: '+b.from+' to '+b.to;
+  $('reportSales').textContent=money(total);$('reportCollected').textContent=money(paid);$('reportOutstanding').textContent=money(balance);$('reportJobs').textContent=sales.length;
+  const branches=session.branch==='All'?['Mansa','Chinsali']:[session.branch];
+  $('branchPerformanceTable').innerHTML='<table><thead><tr><th>Branch</th><th>Jobs</th><th>Recorded sales</th><th>Collected</th><th>Outstanding</th></tr></thead><tbody>'+branches.map(branch=>{
+    const a=sales.filter(s=>s.branch===branch),t=a.reduce((n,s)=>n+(Number(s.total)||0),0),p=a.reduce((n,s)=>n+(Number(s.paid)||0),0),bal=a.reduce((n,s)=>n+Math.max(0,(Number(s.total)||0)-(Number(s.paid)||0)),0);
+    return '<tr><td><b>'+branch+'</b></td><td>'+a.length+'</td><td>'+money(t)+'</td><td>'+money(p)+'</td><td>'+money(bal)+'</td></tr>';
+  }).join('')+'</tbody></table>';
+  const usage=(db.stockMovements||[]).filter(m=>m.type==='use'&&m.date>=b.from&&m.date<=b.to&&(session.branch==='All'||m.branch===session.branch));
+  const byMaterial={};usage.forEach(m=>{byMaterial[m.material]=(byMaterial[m.material]||0)+Number(m.metres||0)});
+  const names=Object.keys(byMaterial);
+  $('periodMaterialUsage').innerHTML=names.length?'<table><thead><tr><th>Material</th><th>Metres used</th></tr></thead><tbody>'+names.map(n=>'<tr><td>'+esc(n)+'</td><td>'+byMaterial[n].toFixed(2)+' m</td></tr>').join('')+'</tbody></table>':'<div class="empty">No material usage recorded for this period.</div>';
+}
+function stockBalance(branch,material){
+  return (db.stockMovements||[]).filter(m=>m.branch===branch&&m.material.toLowerCase()===material.toLowerCase()).reduce((n,m)=>n+(m.type==='receive'?Number(m.metres): -Number(m.metres)),0);
+}
+function receiveStock(){
+  if(!session)return;const branch=$('stockBranch').value,material=$('stockMaterial').value.trim(),metres=Number($('stockReceived').value);
+  if(!material||!Number.isFinite(metres)||metres<=0){alert('Enter a material name and a quantity greater than zero.');return}
+  if(session.branch!=='All'&&branch!==session.branch){alert('You can only receive stock for your permitted branch.');return}
+  db.stockMovements.unshift({id:Date.now(),clientOperationId:crypto.randomUUID(),cloudSaved:false,date:today(),branch,material,metres,type:'receive',reason:'Stock received',user:session.label});
+  log('Stock received',branch+' • '+material+' • '+metres.toFixed(2)+' m');persist();
+  $('stockMaterial').value='';$('stockReceived').value='';renderInventory();renderPerformance();alert('Stock receipt recorded.');
+}
+function recordStockUsage(){
+  if(!session)return;const branch=$('usageBranch').value,material=$('usageMaterial').value.trim(),metres=Number($('usageMetres').value),reason=$('usageReason').value.trim();
+  if(!material||!Number.isFinite(metres)||metres<=0){alert('Enter a material name and metres used greater than zero.');return}
+  if(session.branch!=='All'&&branch!==session.branch){alert('You can only record usage for your permitted branch.');return}
+  const available=stockBalance(branch,material);if(metres>available){alert('Insufficient '+material+' stock in '+branch+'. Available: '+available.toFixed(2)+' m.');return}
+  db.stockMovements.unshift({id:Date.now(),clientOperationId:crypto.randomUUID(),cloudSaved:false,date:today(),branch,material,metres,type:'use',reason:reason||'Manual usage',user:session.label});
+  log('Material used',branch+' • '+material+' • '+metres.toFixed(2)+' m • '+(reason||'Manual usage'));persist();
+  $('usageMaterial').value='';$('usageMetres').value='';$('usageReason').value='';renderInventory();renderPerformance();alert('Material usage recorded and deducted from branch stock.');
+}
+function renderInventory(){
+  if(!session)return;
+  const branches=session.branch==='All'?['Mansa','Chinsali']:[session.branch],keys={};
+  (db.stockMovements||[]).forEach(m=>{if(branches.includes(m.branch))keys[m.branch+'||'+m.material]={branch:m.branch,material:m.material}});
+  const rows=Object.values(keys);
+  $('inventoryTable').innerHTML=rows.length?'<table><thead><tr><th>Branch</th><th>Material</th><th>Received</th><th>Used</th><th>Remaining</th></tr></thead><tbody>'+rows.map(x=>{
+    const a=(db.stockMovements||[]).filter(m=>m.branch===x.branch&&m.material.toLowerCase()===x.material.toLowerCase()),received=a.filter(m=>m.type==='receive').reduce((n,m)=>n+Number(m.metres),0),used=a.filter(m=>m.type==='use').reduce((n,m)=>n+Number(m.metres),0),remaining=received-used;
+    return '<tr><td>'+x.branch+'</td><td>'+esc(x.material)+'</td><td>'+received.toFixed(2)+' m</td><td>'+used.toFixed(2)+' m</td><td><b>'+remaining.toFixed(2)+' m</b></td></tr>';
+  }).join('')+'</tbody></table>':'<div class="empty">No stock recorded yet. Receive stock to begin.</div>';
+  const history=(db.stockMovements||[]).filter(m=>branches.includes(m.branch));
+  $('stockMovementTable').innerHTML=history.length?'<table><thead><tr><th>Date</th><th>Branch</th><th>Material</th><th>Movement</th><th>Metres</th><th>Reason / reference</th><th>Recorded by</th></tr></thead><tbody>'+history.map(m=>'<tr><td>'+esc(m.date)+'</td><td>'+m.branch+'</td><td>'+esc(m.material)+'</td><td>'+ (m.type==='receive'?'Received':'Used')+'</td><td>'+Number(m.metres).toFixed(2)+' m</td><td>'+esc(m.reason||'')+'</td><td>'+esc(m.user||'')+'</td></tr>').join('')+'</tbody></table>':'<div class="empty">No stock movements yet.</div>';
+}
+
+function parseItems(){return $('qItems').value.split('\n').map(line=>line.trim()).filter(Boolean).map(line=>{const p=line.split('|').map(x=>x.trim());return {description:p[0]||'',qty:Number(p[1]||1),price:Number(p[2]||0)}})}
+function quoteObject(){const items=parseItems();return {id:Date.now(),clientOperationId:crypto.randomUUID(),cloudSaved:false,branch:$('qBranch').value,number:$('qNumber').value.trim()||'Q-'+$('qBranch').value.slice(0,1).toUpperCase()+'-'+Date.now().toString().slice(-7),date:$('qDate').value||today(),customer:$('qCustomer').value.trim(),contact:$('qContact').value.trim(),validity:Number($('qValidity').value||14),items,terms:$('qTerms').value.trim(),user:session.label,total:items.reduce((n,i)=>n+i.qty*i.price,0)}}
+function quoteMarkup(q){return `<div style="max-width:850px;margin:auto;font-family:Arial;color:#111"><div style="border-bottom:5px solid #f5c400;padding-bottom:14px;display:flex;justify-content:space-between"><div><h1 style="color:#0756a6;margin:0">RAYSIS PRINTING HOUSE</h1><b>QUALITY PRINTING, QUALITY BRANDS</b><p style="margin:5px 0">Chilyapa Market, by the traffic lights, next to Mukel Electrical<br>Mansa, Zambia • Phone: +260 770 247 490</p></div><div style="text-align:right"><h1>QUOTATION</h1><b>${esc(q.number)}</b><p>Date: ${esc(q.date)}<br>Valid for: ${q.validity} days</p></div></div><p><b>Prepared for:</b> ${esc(q.customer)}<br><b>Contact:</b> ${esc(q.contact)}<br><b>Branch:</b> ${esc(q.branch)}</p><table style="width:100%;border-collapse:collapse"><thead><tr><th style="background:#eaf3fc">Description</th><th style="background:#eaf3fc">Qty</th><th style="background:#eaf3fc">Unit price</th><th style="background:#eaf3fc">Amount</th></tr></thead><tbody>${q.items.map(i=>`<tr><td>${esc(i.description)}</td><td>${i.qty}</td><td>${money(i.price)}</td><td>${money(i.qty*i.price)}</td></tr>`).join('')}</tbody><tfoot><tr><td colspan="3" style="text-align:right"><b>TOTAL</b></td><td><b>${money(q.total)}</b></td></tr></tfoot></table><p><b>Terms and conditions:</b><br>${esc(q.terms||'Prices are as quoted. Production begins after confirmation and any agreed deposit.')}</p><div style="display:flex;justify-content:space-between;margin-top:55px"><span>________________________<br>Prepared by</span><span>________________________<br>Customer approval</span></div><p style="text-align:center;color:#555;border-top:1px solid #ddd;padding-top:10px;margin-top:35px">Thank you for choosing Raysis Printing House.</p></div>`}
+function previewQuote(){const q=quoteObject();if(!q.customer||!q.items.length||q.items.some(i=>!i.description||i.qty<=0||i.price<0)){alert('Enter a customer and at least one valid item line: Description | Qty | Unit price.');return}lastQuote=q;$('quotePreview').classList.remove('hidden');$('quotePreview').innerHTML=quoteMarkup(q)}
+function printQuote(){if(!lastQuote)previewQuote();if(!lastQuote)return;$('printArea').innerHTML=quoteMarkup(lastQuote);window.print()}
+function saveQuote(){const q=quoteObject();if(!q.customer||!q.items.length||q.items.some(i=>!i.description||i.qty<=0||i.price<0)){alert('Enter a customer and at least one valid item line: Description | Qty | Unit price.');return}if(db.quotes.some(x=>x.number===q.number)){alert('That quotation number already exists.');return}db.quotes.unshift(q);log('Quotation saved',q.number+' • '+q.customer+' • '+money(q.total));persist();lastQuote=q;renderQuotes();renderDashboard();alert('Quotation saved. When the customer accepts it, use Accept & create sale to record payment and generate the linked invoice and delivery note.')}
+function renderQuotes(){const a=visibleQuotes();$('quotesTable').innerHTML=a.length?'<table><thead><tr><th>Quotation</th><th>Date</th><th>Branch</th><th>Customer</th><th>Total</th><th>Recorded by</th><th>Next step</th></tr></thead><tbody>'+a.map(q=>`<tr><td>${esc(q.number)}</td><td>${esc(q.date)}</td><td>${esc(q.branch)}</td><td>${esc(q.customer)}<div class="muted">${esc(q.contact)}</div></td><td>${money(q.total)}</td><td>${esc(q.user)}</td><td>${q.convertedSaleId?'<span class="tag paid">Sale created</span>':'<button class="small" onclick="acceptQuotation('+q.id+')">Accept & create sale</button>'}</td></tr>`).join('')+'</tbody></table>':'<div class="empty">No quotations saved yet.</div>'}
+
+async function acceptQuotation(quoteId){
+ const q=db.quotes.find(x=>String(x.id)===String(quoteId));if(!q)return;
+ if(q.convertedSaleId){alert('This quotation has already been converted to a sale.');return;}
+ const paidText=prompt('Quotation total: '+money(q.total)+'\\nEnter amount received now (enter 0 if no payment has been received):','0');
+ if(paidText===null)return;const paid=Number(paidText);
+ if(!Number.isFinite(paid)||paid<0||paid>q.total){alert('Enter a valid payment between K0 and the quotation total.');return;}
+ try{
+  if(!q.cloudSaved)await syncCloudData();
+  const receipt='RYS-'+q.branch.slice(0,1).toUpperCase()+'-'+Date.now().toString().slice(-7);
+  const {data:saleId,error}=await supabaseClient.rpc('convert_quotation_to_sale',{p_quote_id:Number(q.id),p_paid:paid,p_receipt_number:receipt});
+  if(error)throw error;
+  const items=(q.items||[]).map(i=>({description:i.description,qty:Number(i.qty)||1,price:Number(i.price)||0}));
+  const sale={id:Number(saleId),cloudSaved:true,branch:q.branch,receipt,date:today(),customer:q.customer,phone:q.contact||'',product:items.map(i=>i.description).join(', '),items,total:Number(q.total)||0,paid,method:'Cash',notes:'Created from accepted quotation '+q.number,user:session.label,quoteId:q.id,quoteNumber:q.number,invoiceNo:'INV-'+q.branch.slice(0,1).toUpperCase()+'-'+receipt.slice(-7),deliveryNo:'DN-'+q.branch.slice(0,1).toUpperCase()+'-'+receipt.slice(-7)};
+  db.sales.unshift(sale);q.convertedSaleId=Number(saleId);q.acceptedDate=sale.date;q.cloudSaved=true;
+  persist();renderQuotes();renderSales();renderDashboard();renderSearch();
+  if(confirm('Sale created successfully. Download the invoice PDF now?'))downloadSaleDocument(sale.id,'invoice');
+  if(confirm('Download the delivery note now?'))downloadSaleDocument(sale.id,'delivery');
+ }catch(e){alert('Quotation conversion failed: '+(e.message||e));}
+}
+function logoDataURL(){return new Promise(resolve=>{const img=new Image();img.onload=()=>{try{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);resolve(c.toDataURL('image/jpeg',0.88));}catch(e){resolve(null);}};img.onerror=()=>resolve(null);img.src='raysis-logo.jpeg';})}
+async function downloadSaleDocument(saleId,kind){
+  const sale=db.sales.find(x=>String(x.id)===String(saleId));if(!sale)return alert('Transaction not found.');
+  if(!window.jspdf||!window.jspdf.jsPDF){alert('PDF generator could not load. Connect to the internet, refresh the system, and try again.');return;}
+  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'}),isInvoice=kind==='invoice';
+  const navy=[7,86,166],gold=[245,196,0],black=[35,45,58],grey=[100,116,139];
+  const logo=await logoDataURL();if(logo){try{doc.addImage(logo,'JPEG',14,10,31,22);}catch(e){}}
+  doc.setTextColor(...navy);doc.setFont('helvetica','bold');doc.setFontSize(17);doc.text('RAYSIS PRINTING HOUSE',50,17);
+  doc.setTextColor(...black);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('QUALITY PRINTING, QUALITY BRANDS',50,23);
+  doc.setFont('helvetica','normal');doc.setFontSize(7.2);
+  doc.text('Chilyapa Market, by the traffic lights, next to Mukel Electrical, Mansa, Zambia',50,29);
+  doc.text('Tel: 0978 991 431  |  0770 247 490  |  WhatsApp: 0978 991 431 / 0770 247 490',50,34);
+  doc.text('Email: markdivinemapalo1@gmail.com  |  silwimbaraymond00@gmail.com',50,39);
+  doc.setFont('helvetica','bold');doc.text('TPIN: 200559995',196,44,{align:'right'});
+  doc.setDrawColor(...gold);doc.setLineWidth(1.6);doc.line(14,47,196,47);
+  doc.setTextColor(...navy);doc.setFont('helvetica','bold');doc.setFontSize(20);doc.text(isInvoice?'INVOICE':'DELIVERY NOTE',14,59);
+  const docNo=isInvoice?(sale.invoiceNo||'INV-'+String(sale.id).slice(-7)):(sale.deliveryNo||'DN-'+String(sale.id).slice(-7));
+  doc.setTextColor(...black);doc.setFontSize(9);doc.text('Document No: '+docNo,196,58,{align:'right'});doc.text('Date: '+(sale.date||today()),196,64,{align:'right'});
+  doc.setFont('helvetica','bold');doc.text('CUSTOMER DETAILS',14,75);doc.setFont('helvetica','normal');doc.text('Name: '+(sale.customer||'-'),14,82);doc.text('Contact: '+(sale.phone||'-'),14,88);doc.text('Branch: '+(sale.branch||'-'),14,94);
+  if(sale.quoteNumber)doc.text('Quotation reference: '+sale.quoteNumber,14,100);
+  const items=(sale.items&&sale.items.length?sale.items:[{description:sale.product||'Goods / services',qty:1,price:Number(sale.total)||0}]);
+  let y=sale.quoteNumber?112:106;doc.setFillColor(...navy);doc.rect(14,y,182,9,'F');doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(8);doc.text('DESCRIPTION',18,y+6);doc.text('QTY',126,y+6);doc.text('UNIT PRICE',148,y+6);doc.text('AMOUNT',192,y+6,{align:'right'});
+  y+=9;doc.setTextColor(...black);doc.setFont('helvetica','normal');
+  items.forEach((item,index)=>{const desc=doc.splitTextToSize(String(item.description||''),100);const h=Math.max(9,desc.length*4.5+4);if(y+h>255){doc.addPage();y=20;}doc.setDrawColor(220,228,237);doc.line(14,y+h,196,y+h);doc.text(desc,18,y+6);doc.text(String(item.qty||1),126,y+6);doc.text(money(Number(item.price)||0),148,y+6);doc.text(money((Number(item.qty)||1)*(Number(item.price)||0)),192,y+6,{align:'right'});y+=h;});
+  y+=8;const total=Number(sale.total)||0,paid=Number(sale.paid)||0,balance=Math.max(0,total-paid);
+  doc.setFont('helvetica','bold');doc.text('TOTAL: '+money(total),192,y,{align:'right'});
+  if(isInvoice){y+=7;doc.setFont('helvetica','normal');doc.text('Amount paid: '+money(paid),192,y,{align:'right'});y+=6;doc.setFont('helvetica','bold');doc.text('BALANCE DUE: '+money(balance),192,y,{align:'right'});y+=8;doc.setFont('helvetica','normal');doc.text('Payment status: '+paymentStatus(sale),14,y);doc.text('Payment method: '+(sale.method||'Not recorded'),14,y+6);}
+  else{y+=12;doc.setFont('helvetica','normal');doc.text('I acknowledge receipt of the goods / items listed above in good condition.',14,y);y+=10;doc.text('Delivery location: _______________________________________________',14,y);y+=10;doc.text('Receiver phone: _________________________________________________',14,y);y+=18;doc.line(14,y,88,y);doc.line(120,y,196,y);doc.setFontSize(8);doc.text('Received by (full name & signature)',14,y+5);doc.text('Delivery date',120,y+5);}
+  const footerY=Math.min(280,Math.max(y+18,270));doc.setDrawColor(...gold);doc.setLineWidth(.8);doc.line(14,footerY-7,196,footerY-7);doc.setTextColor(...grey);doc.setFontSize(8);doc.text('Thank you for choosing Raysis Printing House.',105,footerY,{align:'center'});
+  const safe=(sale.customer||'customer').replace(/[^a-z0-9-_]+/gi,'_');doc.save((isInvoice?'Raysis_Invoice_':'Raysis_Delivery_Note_')+safe+'_'+docNo+'.pdf');
+  log((isInvoice?'Invoice':'Delivery note')+' downloaded',docNo+' • '+sale.customer);persist();
+}
+
+function clearQuote(){['qNumber','qCustomer','qContact','qItems','qTerms'].forEach(id=>$(id).value='');$('qDate').value=today();$('qValidity').value=14;$('quotePreview').classList.add('hidden');lastQuote=null}
+function renderSearch(){if(!session)return;let a=visibleSales();const val=id=>$(id).value.trim().toLowerCase();if(val('fFrom'))a=a.filter(s=>s.date>=val('fFrom'));if(val('fTo'))a=a.filter(s=>s.date<=val('fTo'));if(val('fBranch'))a=a.filter(s=>s.branch===val('fBranch'));if(val('fReceipt'))a=a.filter(s=>s.receipt.toLowerCase().includes(val('fReceipt')));if(val('fCustomer'))a=a.filter(s=>(s.customer+' '+s.phone).toLowerCase().includes(val('fCustomer')));if(val('fProduct'))a=a.filter(s=>s.product.toLowerCase().includes(val('fProduct')));if(val('fStatus'))a=a.filter(s=>paymentStatus(s)===val('fStatus'));if(val('fMin'))a=a.filter(s=>s.total>=Number(val('fMin')));if(val('fMax'))a=a.filter(s=>s.total<=Number(val('fMax')));if(val('fUser'))a=a.filter(s=>s.user.toLowerCase().includes(val('fUser')));window.searchResults=a;$('resultCount').textContent=a.length+' result(s)';$('searchTable').innerHTML=salesRows(a)}
+function clearFilters(){['fFrom','fTo','fReceipt','fCustomer','fProduct','fMin','fMax','fUser'].forEach(id=>$(id).value='');['fBranch','fStatus'].forEach(id=>$(id).value='');renderSearch()}
+async function renderAudit(){
+ if(!session)return;
+ const {data,error}=await supabaseClient.from('audit_logs').select('*').order('occurred_at',{ascending:false}).limit(300);
+ if(error){$('auditTable').textContent='Cloud audit unavailable. Apply the migration and reload. '+error.message;return;}
+ const rows=data||[];
+ $('auditTable').innerHTML=rows.length?'<table><thead><tr><th>Date & time</th><th>Actor ID</th><th>Branch</th><th>Table</th><th>Action</th><th>Record</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+esc(new Date(x.occurred_at).toLocaleString())+'</td><td>'+esc(x.actor_id||'System')+'</td><td>'+esc(x.branch_name||'—')+'</td><td>'+esc(x.table_name)+'</td><td>'+esc(x.action)+'</td><td>'+esc(x.record_id||'—')+'</td></tr>').join('')+'</tbody></table>':'<div class="empty">No cloud audit entries yet.</div>';
+}
+
+async function submitCorrection(){
+ if(!session)return;
+ const reason=$('correctionReason').value.trim(),entity_id=$('correctionRecord').value.trim();
+ if(!reason||!entity_id){alert('Enter a record reference and explain the correction.');return;}
+ const branch_name=session.branch==='All'?$('saleBranch').value:session.branch;
+ const {error}=await supabaseClient.from('correction_requests').insert({branch_name,entity_type:$('correctionType').value,entity_id,reason,proposed_changes:{},requested_by:session.userId});
+ if(error){alert('Could not submit: '+error.message);return;}
+ $('correctionReason').value='';$('correctionRecord').value='';await loadCorrectionRequests();alert('Correction request submitted.');
+}
+async function loadCorrectionRequests(){
+ if(!session)return;
+ const {data,error}=await supabaseClient.from('correction_requests').select('*').order('requested_at',{ascending:false}).limit(300);
+ if(error){$('correctionTable').textContent='Correction requests unavailable. Apply the database migration first. '+error.message;return;}
+ const rows=data||[];
+ $('correctionTable').innerHTML=rows.length?'<table><thead><tr><th>Date</th><th>Branch</th><th>Record</th><th>Reason</th><th>Status</th><th>Review</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+esc(new Date(x.requested_at).toLocaleString())+'</td><td>'+esc(x.branch_name)+'</td><td>'+esc(x.entity_type)+' / '+esc(x.entity_id)+'</td><td>'+esc(x.reason)+'</td><td>'+esc(x.status)+'</td><td>'+(session.role==='ceo'&&x.status==='pending'?'<button class="small" onclick="reviewCorrection('+Number(x.id)+',\'approved\')">Approve</button> <button class="small secondary" onclick="reviewCorrection('+Number(x.id)+',\'rejected\')">Reject</button>':'—')+'</td></tr>').join('')+'</tbody></table>':'<div class="empty">No correction requests yet.</div>';
+}
+async function reviewCorrection(id,status){
+ if(session?.role!=='ceo')return;
+ const review_note=prompt('Optional review note:','')||'';
+ const {error}=await supabaseClient.from('correction_requests').update({status,reviewed_by:session.userId,reviewed_at:new Date().toISOString(),review_note}).eq('id',id);
+ if(error){alert('Review failed: '+error.message);return;}await loadCorrectionRequests();
+}
+async function adminCall(payload){
+ const {data:{session:authSession}}=await supabaseClient.auth.getSession();
+ if(!authSession)throw new Error('Sign in again.');
+ const {data,error}=await supabaseClient.functions.invoke('ceo-user-admin',{body:payload,headers:{Authorization:'Bearer '+authSession.access_token}});
+ if(error)throw error;if(data&&data.error)throw new Error(data.error);return data;
+}
+async function loadStaffUsers(){
+ if(session?.role!=='ceo')return;
+ $('usersTable').textContent='Loading users…';
+ try{
+  const result=await adminCall({action:'list'}),users=result.users||[];
+  $('usersTable').innerHTML=users.length?'<table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Branch</th><th>Access</th><th>Actions</th></tr></thead><tbody>'+users.map(u=>'<tr><td>'+esc(u.full_name)+'</td><td>'+esc(u.email)+'</td><td>'+esc(u.role)+'</td><td>'+esc(u.branch_name||'All')+'</td><td>'+(u.disabled?'Disabled':'Active')+'</td><td><button class="small secondary" onclick="toggleStaffUser(\''+u.id+'\','+(u.disabled?'true':'false')+')">'+(u.disabled?'Enable':'Disable')+'</button></td></tr>').join('')+'</tbody></table>':'<div class="empty">No profiles found.</div>';
+ }catch(e){$('usersTable').textContent='User administration unavailable: '+(e.message||e)+'. Deploy the CEO Edge Function first.';}
+}
+loadLocal();
+const savedCfg=getConfig();if(savedCfg.key)$('publishableKey').value=savedCfg.key;
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js").catch(function (error) {
+      console.error("Raysis offline setup failed:", error);
+    });
+  });
+}
+</script>
+</body>
+</html>
